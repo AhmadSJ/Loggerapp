@@ -1,0 +1,49 @@
+version: "3.7"
+
+services:
+  sessions_db:
+    image: postgres
+    container_name: pgdb
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    ports:
+      - 5432:5432
+    volumes:
+      - ./sql-dump/create_database.sql:/docker-entrypoint-initdb.d/create_database.sql
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: Welcome
+
+  sessions_app:
+    image: sessionsapp_maven
+    container_name: conference-sessions
+    ports:
+      - 8080:8080
+    volumes:
+      - ./logs:/home/log
+    environment:
+      spring.datasource.url: "jdbc:postgresql://pgdb:5432/conference_sessions"
+      logging.file.name: "/home/log/sessionsapp-logfile.log"
+      TZ: "Europe/Amsterdam"
+
+  logger_app:
+    image: loggerapp_maven
+    container_name: logger-app
+    ports:
+      - 8081:8081
+    volumes:
+      - ./logs:/home/log
+    environment:
+      logging.file.name: "/home/log/loggerapp-logfile.file"
+      TZ: "Europe/Amsterdam"
+
+volumes:
+  test-volume:
+  pgdata:
+
+networks:
+  default:
+    name: default-log-network

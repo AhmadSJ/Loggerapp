@@ -1,0 +1,29 @@
+server:
+  port: 8082
+
+spring:
+  datasource:
+#    url: jdbc:h2:file:C:/Code/loggerapp_sessions_docker-compose/LoggerApp/src/main/resources/data/employee_DB;AUTO_SERVER=true;INIT=CREATE SCHEMA IF NOT EXISTS sch_competent;
+    url: jdbc:h2:mem:my_db;INIT=CREATE SCHEMA IF NOT EXISTS sch_competent;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false;
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        default_schema: sch_competent
+  liquibase:
+    change-log: "classpath:db/changelog/db.changelog-master.xml"
+    enabled: true
+    default-schema: sch_competent
+  flyway:
+    enabled: false
+    baseline-on-migrate: true
+
